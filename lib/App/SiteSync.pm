@@ -198,7 +198,7 @@ sub run_phases {
     my($self) = @_;
 
     my $list_only = $self->opt('list-phases');
-    my @phases = $self->user_phases;
+    my @phases = $self->selected_phases;
     @phases = $self->all_phases if !@phases;
 
     foreach my $phase ( @phases ) {
@@ -220,18 +220,18 @@ sub all_phases {
 }
 
 
-sub user_phases {
+sub selected_phases {
     my($self) = @_;
 
-    my $user_phases = $self->opt('phase');
-    return unless @$user_phases;
+    my $selected_phases = $self->opt('phase');
+    return unless @$selected_phases;
 
     my %valid = map { $_ => 1 } $self->all_phases;
-    foreach my $phase ( @$user_phases ) {
+    foreach my $phase ( @$selected_phases ) {
         die "Unrecognised phase '$phase'\n" unless $valid{$phase};
     }
 
-    my %want = map { $_ => 1 } @$user_phases;
+    my %want = map { $_ => 1 } @$selected_phases;
     return grep { $want{$_} } $self->all_phases;
 }
 
