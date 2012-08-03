@@ -45,6 +45,9 @@ sub run {
     $self->load_config;
     $self->set_default_mappings($default_mappings);
     $self->select_site;
+
+    chdir($self->site_work);
+
     $self->run_phases;
 }
 
@@ -155,7 +158,7 @@ sub select_site {
                 . "Available sites: $site_names\n";
         }
     }
-    elsif(@$sites != 1) {
+    elsif(@$sites == 1) {
         $self->{site} = $sites->[0];
     }
     else {
@@ -166,8 +169,6 @@ sub select_site {
     $self->extract_domain;
     $self->{site_work}  = $self->work_root . '/' . $self->site->{name};
     $self->{spider_dir} = $self->site_work . '/' . $self->source_domain;
-
-    chdir($self->{site_work});
 }
 
 
