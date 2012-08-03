@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+##############################################################################
+#
+# Script:   sitesync
+#
+# Author:   Grant McLean <grant@catalyst.net.nz>
+#
+# Description:
+#
+# This tool is used for spidering content out of a web site (typically a CMS)
+# and saving it as static files.  For more information see:
+#
+#     sitesync --help
+#
+
+use 5.010;
+use strict;
+use warnings;
+use autodie;
+
+use App::SiteSync;
+
+App::SiteSync->run;
+
+exit 0;
+
+
+__END__
+
+=head1 NAME
+
+sitesync - Spider a site from a CMS to static files
+
+=head1 SYNOPSIS
+
+  sitesync [options]
+
+  Options:
+
+   --config <file>   Alternate config file (default: /etc/sitesync.conf)
+   --list-phases     Don't spider/publish, just list what would be done
+   --phase <name>    Specify one phase to run
+   --site <name>     Name of the site to publish
+   --help            More detailed help message
+
+=head1 DESCRIPTION
+
+This script and associated modules provide a configurable framework to automate the process of:
+
+=over 4
+
+=item *
+
+invoking wget to spider a site to static files
+
+=item *
+
+applying 'fixups' to the files
+
+=item *
+
+rsyncing the resulting files to one or more target servers/directories
+
+=back
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<< --config <file> >> (alias -c)
+
+Specify the name of a config file.  If this option is not used, the default
+config filename of F</etc/sitesync.conf> will be used.
+
+=item B<< --help >> (alias -?)
+
+Display this documentation.
+
+=item B<< --list-phases >> (alias -l)
+
+If this option is specified, no spidering will be performed, instead the list
+ofphases to be performed will be printed on STDOUT.
+
+=item B<< --phase <name> >> (alias -p)
+
+Use this option to specify a single phase to run rather than running all phases
+of the spidering/publishing process.
+
+=item B<< --site <name> >> (alias -s)
+
+Specify the name of the site to spider/publish.  This must correspond to the
+C<name> of a C<< <site> >> section in the config file
+
+=back
+
+
+=head1 CONFIG FILE
+
+TODO: Document
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2012 Catalyst IT
+
+Author: Grant McLean E<lt>Grant McLeanE<gt>
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+
+
+
