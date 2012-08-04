@@ -43,7 +43,7 @@ sub run {
         exit;
     }
     $self->load_config;
-    $self->set_default_mappings($default_mappings);
+    $self->set_default_mappings();
     $self->select_site;
 
     chdir($self->site_work);
@@ -130,10 +130,12 @@ sub config {
 
 
 sub set_default_mappings {
-    my($self, $default_mappings) = @_;
+    my($self, $mappings) = @_;
+
+    $mappings ||= $default_mappings;
 
     my $map = $self->config('class_mappings');
-    while(my($key, $class) = each %$default_mappings) {
+    while(my($key, $class) = each %$mappings) {
         $map->{$key} //= $class;
     }
 }
