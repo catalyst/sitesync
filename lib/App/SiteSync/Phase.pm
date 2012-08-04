@@ -31,6 +31,7 @@ sub site_name     { shift->app->site_name; }
 sub source_url    { shift->app->source_url; }
 sub source_domain { shift->app->source_domain; }
 sub spider_dir    { shift->app->spider_dir; }
+sub onsite_domain { shift->app->onsite_domain(@_); }
 sub log           { shift->app->log(@_); }
 
 sub each_file {

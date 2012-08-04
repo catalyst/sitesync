@@ -42,15 +42,36 @@ sub fix_html_files {
 sub fix_html {
     my($self, $path) = @_;
 
-    # Change %3F to ? in JS/CSS URLs
-    s{([.](?:js|css))%3F}{$1?}g;
+    # Apply link fixups to HREF and SRC attributes
+    s{(<\w[^>]+\b(?:href|src)=)(['"])(.+?)\2}
+     {$1 . $2 . $self->fix_link($3) . $2}isge;
 
-    # Remove domain portion from URLs in 
-
-    my($host_prefix) = $self->source_url =~ m{^(https?://[^/]*)};
-    s{(\@import\s+url\(")$host_prefix}{$1}g;
+    # Apply link fixups to URLs in CSS imports
+    s{(\@import\s+url\()(['"]|)(.+?)\2\)}
+     {$1 . $2 . $self->fix_link($3) . $2 . ')'}isge;
 
     return 1;
+}
+
+
+sub fix_link {
+    my($self, $url) = @_;
+
+    # Return offsite links unchanged
+    if( my($domain, $rest) = $url =~ m{https?://([^/]+)(.*)$} ) {
+        return $url unless $self->onsite_domain($domain);
+        # Strip domain portion of onsite links
+        $url = $rest // '/';
+        $url = '/' unless length $url;
+    }
+
+    # Strip trailing index.html
+    $url =~ s{index[.]html?(#.*|)$}{$1};
+
+    # Fix %3F => ? in cache-busting query suffix on JS/CSS
+    $url =~ s{([.](?:js|css))%3F}{$1?}i;
+
+    return $url;
 }
 
 1;

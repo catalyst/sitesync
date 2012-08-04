@@ -171,6 +171,15 @@ sub select_site {
     $self->extract_domain;
     $self->{site_work}  = $self->work_root . '/' . $self->site->{name};
     $self->{spider_dir} = $self->site_work . '/' . $self->source_domain;
+
+    my %onsite_domain = (
+        $self->source_domain => 1,
+    );
+    if(my $alias = $self->{site}->{domain_alias}) {
+        $alias = [ $alias ] unless ref($alias);
+        $onsite_domain{$_} = 1 foreach @$alias;
+    }
+    $self->{onsite_domain} = \%onsite_domain;
 }
 
 
@@ -193,6 +202,12 @@ sub extract_domain {
         or die "Malformed URL: $source_url\n";
 
     $self->{source_domain} = $domain;
+}
+
+
+sub onsite_domain {
+    my($self, $domain) = @_;
+    return $self->{onsite_domain}->{$domain};
 }
 
 
