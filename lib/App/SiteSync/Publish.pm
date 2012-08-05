@@ -27,7 +27,7 @@ sub publish_to_targets {
     my @targets = $self->list_targets;
 
     foreach my $target ( @targets ) {
-        $self->{target_name} = $target->{name} || 'unnamed';
+        $self->{target_name} = $target->{name} || '<unnamed>';
         $self->publish_to_target( $target );
     }
 }
@@ -40,7 +40,6 @@ sub list_targets {
     my($self) = @_;
 
     my $targets = $self->site->{target};
-
     if($targets and @$targets) {
         return @$targets;
     }

@@ -45,6 +45,7 @@ sub run {
     $self->load_config;
     $self->set_default_mappings();
     $self->select_site;
+    $self->select_targets;
 
     chdir($self->site_work);
 
@@ -61,7 +62,10 @@ sub new {
 sub parse_options {
     my($self) = @_;
 
-    my(%opt) = ( phase => [] );
+    my(%opt) = (
+        phase  => [],
+        target => [],
+    );
     if(!GetOptions(\%opt, $self->getopt_spec)) {
         $self->die_usage();
     }
@@ -71,7 +75,14 @@ sub parse_options {
 
 sub getopt_spec {
     my($self) = @_;
-    return('help|?', 'config|c=s', 'list-phases|l', 'phase|p=s', 'site|s=s');
+    return(
+        'help|?',
+        'config|c=s',
+        'list-phases|l',
+        'phase|p=s',
+        'site|s=s',
+        'target|t=s',
+    );
 }
 
 
@@ -180,6 +191,42 @@ sub select_site {
         $onsite_domain{$_} = 1 foreach @$alias;
     }
     $self->{onsite_domain} = \%onsite_domain;
+}
+
+
+sub select_targets {
+    my($self) = @_;
+
+    my $opt_targets = $self->opt('target') or return;
+
+    my @all_targets = $self->targets;
+    my $target_names = join ', ', map { $_->{name} } @all_targets;
+    $target_names ||= '<none defined>';
+    my %available = map { $_->{name} => $_ } @all_targets;
+
+    my @selected;
+    foreach my $name ( @$opt_targets ) {
+        if($available{$name}) {
+            push @selected, $available{$name};
+        }
+        else {
+            die "No <target> section named '$name' in config file.\n"
+                . "Available targets: $target_names\n";
+        }
+    }
+
+    $self->site->{target} = \@selected;
+}
+
+
+sub targets {
+    my($self) = @_;
+
+    my $targets = $self->site->{target};
+    if($targets and @$targets) {
+        return @$targets;
+    }
+    return;
 }
 
 

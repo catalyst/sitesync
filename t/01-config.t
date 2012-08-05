@@ -21,7 +21,7 @@ like(
 
 # Read the "one-site.conf" file
 
-@main::ARGV = qw(--config t/one-site.conf);
+@main::ARGV = qw(--config t/one-site.conf --target PROD);
 eval {
     $app->parse_options;
     $app->load_config;
@@ -69,6 +69,39 @@ is(
     'spider_dir'
 );
 
+# Check initial, unfiltered, target list
+
+is(
+    target_names($app),
+    'UAT, PROD, DR',
+    'all available targets'
+);
+
+eval {
+    $app->select_targets;
+};
+is("$@", '', 'selected targets without error');
+
+is(
+    target_names($app),
+    'PROD',
+    'target list now filtered to one selection'
+);
+
+@main::ARGV = qw(--config t/one-site.conf --target UAT --target PROD);
+eval {
+    $app->parse_options;
+    $app->load_config;
+    $app->select_site;
+    $app->select_targets;
+};
+is("$@", '', 're-parsed one-site.conf without error');
+
+is(
+    target_names($app),
+    'UAT, PROD',
+    'target list now filtered to two selections'
+);
 
 # Read the "two-sites.conf" file
 
@@ -95,7 +128,7 @@ like(
     "error message lists available sites"
 );
 
-@main::ARGV = qw(--config t/two-sites.conf --site campaign);
+@main::ARGV = qw(--config t/two-sites.conf --site campaign --target UAT);
 $app = App::SiteSync->new;
 eval {
     $app->parse_options;
@@ -116,4 +149,43 @@ is(
     "site-specific work_root"
 );
 
+eval {
+    $app->select_targets;
+};
+like(
+    "$@",
+    qr{No .*target.*'UAT'.*in.*config},
+    "target 'UAT' was not valid"
+);
+like(
+    "$@",
+    qr{Available targets: <none defined>},
+    "no targets available"
+);
+
+@main::ARGV = qw(--config t/two-sites.conf --site campaign);
+$app = App::SiteSync->new;
+eval {
+    $app->parse_options;
+    $app->load_config;
+    $app->select_site;
+    $app->select_targets;
+};
+is("$@", '', 'selected default targets without errors');
+
+is(
+    target_names($app),
+    '',
+    'no targets defined for this <site>'
+);
+
 done_testing;
+
+exit;
+
+
+sub target_names {
+    my($app) = @_;
+
+    return join ', ', map { $_->{name} || '<unnamed>' } $app->targets;
+}
