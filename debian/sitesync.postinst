@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# Abort script on error
+
+set -e
+
+add_user_if_missing() {
+    USERNAME=sitesync
+    if [ -x /usr/sbin/adduser ]; then
+        if ! id -u "${USERNAME}" > /dev/null 2>&1; then
+            adduser --home "/home/${USERNAME}" \
+                --disabled-password \
+                --gecos "" ${USERNAME}
+        fi
+    fi
+}
+
+add_user_if_missing

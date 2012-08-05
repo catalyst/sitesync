@@ -1,0 +1,16 @@
+Source: sitesync
+Section: web
+Priority: optional
+Maintainer: Grant McLean <grant@catalyst.net.nz>
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.1
+Homepage: https://github.com/catalyst/sitesync
+
+Package: sitesync
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, libconfig-general-perl, wget, rsync
+Description: Spider a site from a CMS to static files
+ The package provides a framework for: invoking wget to spider a web site to
+ static files; applying 'fixups' to the files; rsyncing the resulting files
+ to one or more target servers/directories.
