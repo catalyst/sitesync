@@ -18,6 +18,9 @@ like(
     'app is looking for /etc/sitesync.conf by default'
 );
 
+
+# Read the "one-site.conf" file
+
 @main::ARGV = qw(--config t/one-site.conf);
 eval {
     $app->parse_options;
@@ -67,7 +70,7 @@ is(
 );
 
 
-# Create a new app object
+# Read the "two-sites.conf" file
 
 @main::ARGV = qw(--config t/two-sites.conf);
 $app = App::SiteSync->new;
@@ -105,6 +108,12 @@ is(
     $app->site_name,
     'campaign',
     "correct site was selected using --site option"
+);
+
+is(
+    $app->work_root,
+    '/var/projects/campaign/sitesync',
+    "site-specific work_root"
 );
 
 done_testing;

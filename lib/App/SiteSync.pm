@@ -183,7 +183,18 @@ sub select_site {
 }
 
 
-sub work_root     { shift->config('work_root'); }
+sub work_root {
+    my($self) = @_;
+
+    if(my $site = $self->site) {
+        if(my $work_root = $site->{work_root}) {
+            return $work_root;
+        }
+    }
+    return $self->config('work_root');
+}
+
+
 sub site          { shift->{site}; }
 sub source_url    { shift->site->{source_url}; }
 sub source_domain { shift->{source_domain}; }
