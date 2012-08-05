@@ -40,7 +40,8 @@ sitesync - Spider a site from a CMS to static files
    --config <file>   Alternate config file (default: /etc/sitesync.conf)
    --list-phases     Don't spider/publish, just list what would be done
    --phase <name>    Specify one phase to run
-   --site <name>     Name of the site to publish
+   --site <name>     Name of the <site> to publish
+   --target <name>   Name of the <target> to publish to
    --help            More detailed help message
 
 =head1 DESCRIPTION
@@ -51,7 +52,7 @@ This script and associated modules provide a configurable framework to automate 
 
 =item *
 
-invoking wget to spider a site to static files
+invoking wget to spider a web site to static files
 
 =item *
 
@@ -62,6 +63,9 @@ applying 'fixups' to the files
 rsyncing the resulting files to one or more target servers/directories
 
 =back
+
+Common use-cases include 'publishing' a site from a CMS to static files; or
+taking a snapshot of a site for backup/disaster recovery purposes.
 
 
 =head1 OPTIONS
@@ -85,19 +89,141 @@ ofphases to be performed will be printed on STDOUT.
 =item B<< --phase <name> >> (alias -p)
 
 Use this option to specify a single phase to run rather than running all phases
-of the spidering/publishing process.
+of the spidering/publishing process.  You can repeat the C<< --phase >> option
+to select multiple phases.
 
 =item B<< --site <name> >> (alias -s)
 
 Specify the name of the site to spider/publish.  This must correspond to the
-C<name> of a C<< <site> >> section in the config file
+C<name> of a C<< <site> >> section in the config file.
+
+=item B<< --target <name> >> (alias -t)
+
+Specify the name of the target to publish to.  This must correspond to the
+C<name> of a C<< <target> >> section in the config file for the selected site.
+You can repeat the C<< --target >> option to select multiple targets.
 
 =back
 
 
 =head1 CONFIG FILE
 
-TODO: Document
+To use sitesync, you B<must> provide a config file - either the default
+pathname (F</etc/sitesync.conf>) or a custom path specified using the
+C<--config> option.  The config file uses a format similar to Apache config
+files.  Unrecognised config parameters are silently ignored.
+
+The config must contain one or more C<< <site> >> sections which define details
+of the site to spider and which may contain one or more C<< <target> >>
+sections defining where to 'publish' the files after spidering is complete.
+The config file may also define some global settings.
+
+
+=head2 Example
+
+Here's a sample config file:
+
+  work_root     /home/sitesync/work
+
+  <site>
+
+      name          example
+      site_title    Example Web Site
+      source_url    http://cms.example.com/
+      domain_alias  www.example.com
+      domain_alias  example.com
+
+      <target>
+          name            dr-server-1
+          rsync_target    sitesync@dr1.example.com::sitesync_www
+          rsync_secrets   /home/sitesync/.rsync.sitesync
+      </target>
+
+  </site>
+
+
+=head2 Global Section
+
+Recognised global config parameters:
+
+=over 4
+
+=item work_root
+
+This is the top-level directory under which spidered files are saved.  A
+sub-directory will be created for each C<< <site> >>.  This parameter can be
+defined at the global level or inside a C<< <site> >> definition.
+
+=back
+
+
+=head2 C<< <site> >> Section
+
+The following config parameters are recognised in a C<< <site> >> section:
+
+=over 4
+
+=item name
+
+Mandatory short unique identifier for the C<< <site> >> used as a directory
+name and also used with the C<--site> command-line option to select which site
+to spider.
+
+=item site_title
+
+Optional longer, more descriptive name - not currently used.
+
+=item source_url
+
+Mandatory URL of the site to be spidered.  This is usually the home page,
+but you might choose to use something like the "site map" page which is known
+to link to every other page on the site.
+
+=item wget_options
+
+You can specify additional wget options which will be merged with the generated
+command line.  (Note: the full wget command is logged as the first line of
+the F<spider.log>).
+
+=item wget_command
+
+This option allows you to override the complete wget command so that only the
+options you specify are used.  By convention, you probably want to include
+C<< --append-output=spider.log >>.
+
+=back
+
+
+=head2 C<< <target> >> Section
+
+The following config parameters are recognised in a C<< <target> >> section
+which must be contained within a C<< <site> >> section:
+
+=over 4
+
+=item name
+
+A mandatory short unique identifier for the target.
+
+=item rsync_target
+
+Mandatory rsync "destination" parameter.  This might be a local directory path,
+or a path on a remote server using either SSH or rsync protocols.  The formats
+for these alternatives are:
+
+    /path/to/dest               # local
+    user@host:/path/to/dest     # remote via SSH (user@ optional)
+    user@host::/path/to/dest    # remote via rsync daemon
+
+=item rsync_secrets
+
+If you are using the rsync protocol, this option allows you to specify the full
+pathname of a file containing the plain-text rsync password.  This file should
+not be readable by any user other than sitesync (or whichever user you use to
+run sitesync).  Note: rsync uses a secure challenge-response authentication
+mechanism so the password itself is never sent across the network.
+
+=back
 
 
 =head1 COPYRIGHT
