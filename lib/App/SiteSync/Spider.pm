@@ -45,7 +45,17 @@ sub run_wget {
     my($self) = @_;
 
     my @command = $self->wget_command;
+    $self->log_wget_command("@command");
     system(@command);
+}
+
+
+sub log_wget_command {
+    my($self, $command) = @_;
+
+    open my $out, '>', 'spider.log';
+    print $out "# $command\n";
+    close($out);
 }
 
 
@@ -67,7 +77,7 @@ sub wget_command {
         '--backup-converted',
         '--no-verbose',
         '--restrict-file-names=unix,nocontrol',
-        '--output-file=spider.log',
+        '--append-output=spider.log',
         @extra_options,
         '--domains=' . $self->source_domain,
         $self->source_url
