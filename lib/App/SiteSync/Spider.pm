@@ -26,6 +26,7 @@ sub run {
     $self->rotate_spider_log;
     my $start_time = time();
     $self->run_wget;
+    $self->get_robots_txt;
     my $end_time = time();
     $self->remove_duplicates;
     $self->write_timestamps($start_time, $end_time);
@@ -70,6 +71,7 @@ sub wget_command {
     @command = (
         'wget',
         '--recursive',
+        '--execute', 'robots=off',
         '--level=inf',
         '--timestamping',
         '--html-extension',
@@ -105,6 +107,26 @@ sub parse_parts {
     my($self, $string) = @_;
 
     return grep { defined } $string =~ m{(?:"((?:\\"|[^"])+)"|([^"\s]+)\s*)}g;
+}
+
+
+sub get_robots_txt {
+    my($self) = @_;
+
+    my $robots_src = $self->source_url;
+    $robots_src =~ s{^(\w+://[^/]*).*$}{$1/robots.txt};
+
+    my $robots_dst = $self->source_domain . '/robots.txt';
+    unlink($robots_dst) if -e $robots_dst;
+
+    my @command = (
+        'wget',
+        '--no-verbose',
+        '--append-output=spider.log',
+        '--output-document=' . $robots_dst,
+        $robots_src,
+    );
+    system(@command);
 }
 
 
