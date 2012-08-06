@@ -69,6 +69,18 @@ is(
 );
 
 is(
+    $fixup->fix_link('/index.html'),
+    '/',
+    'trailing "index.html" from root relative link'
+);
+
+is(
+    $fixup->fix_link('index.html'),
+    './',
+    'bare "index.html" converted to "./"'
+);
+
+is(
     $fixup->fix_link('http://cms.example.com/index.htm'),
     '/',
     'trailing "index.htm" is stripped too'

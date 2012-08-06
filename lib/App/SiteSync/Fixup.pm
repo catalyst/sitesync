@@ -82,7 +82,10 @@ sub fix_link {
     }
 
     # Strip trailing index.html
-    $url =~ s{index[.]html?(#.*|)$}{$1};
+    $url =~ s{/index[.]html?(#.*|)$}{/$1};
+
+    # Strip bare, leading index.html
+    $url =~ s{^index[.]html?(#.*|)$}{./$1};
 
     # Fix %3F => ? in cache-busting query suffix on JS/CSS
     $url =~ s{([.](?:js|css))%3F}{$1?}i;
