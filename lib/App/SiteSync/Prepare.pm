@@ -19,26 +19,8 @@ App::SiteSync::Prepare - Handle the preparation phase of a sitesync run
 sub run {
     my($self) = @_;
     $self->log("Preparing to spider site: " . $self->site->{name});
-    $self->make_site_work;
     $self->clean_last_dir;
     $self->run_prepare_command
-}
-
-
-sub make_site_work {
-    my($self) = @_;
-
-    my $work_root = $self->work_root;
-
-    die "Directory '$work_root' does not exist\n"
-        unless -d $work_root;
-
-    die "Directory '$work_root' is not writable\n"
-        unless -w $work_root;
-
-    if(!-d $self->site_work) {
-        mkdir($self->site_work);
-    }
 }
 
 

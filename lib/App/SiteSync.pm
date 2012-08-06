@@ -49,6 +49,7 @@ sub run {
     $self->load_config;
     $self->set_default_mappings();
     $self->select_site;
+    $self->make_site_work;
     $self->select_targets;
 
     chdir($self->site_work);
@@ -202,6 +203,23 @@ sub select_site {
         $onsite_domain{$_} = 1 foreach @$alias;
     }
     $self->{onsite_domain} = \%onsite_domain;
+}
+
+
+sub make_site_work {
+    my($self) = @_;
+
+    my $work_root = $self->work_root;
+
+    die "Directory '$work_root' does not exist\n"
+        unless -d $work_root;
+
+    die "Directory '$work_root' is not writable\n"
+        unless -w $work_root;
+
+    if(!-d $self->site_work) {
+        mkdir($self->site_work);
+    }
 }
 
 
