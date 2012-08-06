@@ -98,7 +98,7 @@ to select multiple phases.
 Specify the name of the site to spider/publish.  This must correspond to the
 C<name> of a C<< <site> >> section in the config file.
 
-=item B<< --syslog >> (alias -l)
+=item B<< --syslog >>
 
 Force logging to syslog.  The default behaviour is to log to STDERR if invoked
 from the console or to syslog otherwise (e.g.: if run from cron). This option

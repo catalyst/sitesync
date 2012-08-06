@@ -85,7 +85,7 @@ sub getopt_spec {
         'phase|p=s',
         'site|s=s',
         'target|t=s',
-        'syslog|l',
+        'syslog',
     );
 }
 
