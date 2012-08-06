@@ -136,11 +136,13 @@ Here's a sample config file:
 
   <site>
 
-      name          example
-      site_title    Example Web Site
-      source_url    http://cms.example.com/
-      domain_alias  www.example.com
-      domain_alias  example.com
+      name              example
+      site_title        Example Web Site
+      source_url        http://cms.example.com/
+      domain_alias      www.example.com
+      domain_alias      example.com
+      prepare_command   /path/to/your-script1
+      cleanup_command   /path/to/your-script1
 
       <target>
           name            dr-server-1
@@ -211,6 +213,14 @@ the F<spider.log>).
 This option allows you to override the complete wget command so that only the
 options you specify are used.  By convention, you probably want to include
 C<< --append-output=spider.log >>.
+
+=item prepare_command
+
+Optional, name of script to run before spidering begins.
+
+=item cleanup_command
+
+Optional, name of script to run after all spidering and publishing is complete.
 
 =back
 
