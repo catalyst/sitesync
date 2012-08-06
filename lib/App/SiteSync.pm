@@ -207,7 +207,8 @@ sub select_site {
 sub select_targets {
     my($self) = @_;
 
-    my $opt_targets = $self->opt('target') or return;
+    my $opt_targets = $self->opt('target');
+    return unless @$opt_targets;
 
     my @all_targets = $self->targets;
     my $target_names = join ', ', map { $_->{name} } @all_targets;

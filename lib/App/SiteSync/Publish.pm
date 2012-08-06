@@ -39,10 +39,8 @@ sub target_name { shift->{target_name}; }
 sub list_targets {
     my($self) = @_;
 
-    my $targets = $self->site->{target};
-    if($targets and @$targets) {
-        return @$targets;
-    }
+    my @targets = $self->app->targets;
+    return @targets if @targets;
 
     $self->log("No targets defined - skipping publish");
     return;
