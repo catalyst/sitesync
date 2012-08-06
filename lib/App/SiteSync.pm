@@ -387,13 +387,11 @@ rsyncing the resulting files to one or more target servers/directories
 
 =back
 
-=head1 METHODS
-
 =head1 COPYRIGHT 
 
 Copyright (c) 2012 Catalyst IT
 
-Author: Grant McLean E<lt>Grant McLeanE<gt>
+Author: Grant McLean E<lt>grant@catalyst.net.nzE<gt>
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
