@@ -5,6 +5,7 @@ use warnings;
 use strict;
 use autodie;
 use Carp;
+use POSIX       qw(strftime);
 use Sys::Syslog qw(openlog syslog closelog);
 
 
@@ -334,7 +335,8 @@ sub log {
         $self->log_to_syslog($message);
         return;
     }
-    print STDERR  "$message\n";
+    my $timestamp = strftime('%T', localtime);
+    print STDERR  "$timestamp $message\n";
 }
 
 
