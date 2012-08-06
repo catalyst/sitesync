@@ -9,7 +9,7 @@ Homepage: https://github.com/catalyst/sitesync
 
 Package: sitesync
 Architecture: all
-Depends: ${misc:Depends}, ${perl:Depends}, libconfig-general-perl, wget, rsync
+Depends: ${misc:Depends}, ${perl:Depends}, perl-doc, libconfig-general-perl, wget, rsync
 Description: Spider a site from a CMS to static files
  The package provides a framework for: invoking wget to spider a web site to
  static files; applying 'fixups' to the files; rsyncing the resulting files
