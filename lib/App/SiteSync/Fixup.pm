@@ -8,8 +8,6 @@ use Carp;
 
 use parent 'App::SiteSync::Phase';
 
-use File::Slurp qw(read_file write_file);
-
 
 =head1 NAME
 
@@ -32,10 +30,28 @@ sub fix_html_files {
         my($path) = @_;
 
         return unless $path =~ m{[.]html?(?:\?.*)?$};
-        $_ = read_file($path);
+        $_ = $self->read_file($path);
         $self->fix_html($path) or return;
-        write_file($path, $_);
+        $self->write_file($path, $_);
     });
+}
+
+
+sub read_file {
+    my($self, $path) = @_;
+
+    open my $fh, '<', $path;
+    local($/);
+    return <$fh>;
+}
+
+
+sub write_file {
+    my($self, $path, $content) = @_;
+
+    open my $fh, '>', $path;
+    print $fh $content;
+    close($fh);
 }
 
 
