@@ -42,6 +42,7 @@ sitesync - Spider a site from a CMS to static files
    --phase <name>    Specify one phase to run
    --site <name>     Name of the <site> to publish
    --target <name>   Name of the <target> to publish to
+   --syslog          Log to syslog rather than STDERR
    --help            More detailed help message
 
 =head1 DESCRIPTION
@@ -97,6 +98,12 @@ to select multiple phases.
 Specify the name of the site to spider/publish.  This must correspond to the
 C<name> of a C<< <site> >> section in the config file.
 
+=item B<< --syslog >> (alias -l)
+
+Force logging to syslog.  The default behaviour is to log to STDERR if invoked
+from the console or to syslog otherwise (e.g.: if run from cron). This option
+forces logging to go to syslog even if run from the console.
+
 =item B<< --target <name> >> (alias -t)
 
 Specify the name of the target to publish to.  This must correspond to the
@@ -124,6 +131,8 @@ The config file may also define some global settings.
 Here's a sample config file:
 
   work_root     /home/sitesync/work
+  log_facility  local0
+  log_priority  info
 
   <site>
 
@@ -153,6 +162,18 @@ Recognised global config parameters:
 This is the top-level directory under which spidered files are saved.  A
 sub-directory will be created for each C<< <site> >>.  This parameter can be
 defined at the global level or inside a C<< <site> >> definition.
+
+=item log_facility
+
+Syslog facility (e.g. user, daemon, local0 etc) to use for log messages.  This
+parameter can be defined at the global level or inside a C<< <site> >>
+definition.
+
+=item log_priority
+
+Syslog priority (e.g. info, notice, error etc) to use for log messages.  All
+log messages will be passed to syslog with this priority.  This parameter can
+be defined at the global level or inside a C<< <site> >> definition.
 
 =back
 

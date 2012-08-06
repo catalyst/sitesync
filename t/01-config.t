@@ -34,6 +34,18 @@ is(
     'default work_root'
 );
 
+is(
+    $app->log_facility,
+    'user',
+    'default log_facility'
+);
+
+is(
+    $app->log_priority,
+    'info',
+    'default log_priority'
+);
+
 eval {
     $app->select_site;
 };
@@ -113,6 +125,18 @@ eval {
 };
 is("$@", '', 'parsed two-sites.conf without error');
 
+is(
+    $app->log_facility,
+    'local7',
+    'global log_facility'
+);
+
+is(
+    $app->log_priority,
+    'notice',
+    'global log_priority'
+);
+
 eval {
     $app->select_site;
 };
@@ -147,6 +171,18 @@ is(
     $app->work_root,
     '/var/projects/campaign/sitesync',
     "site-specific work_root"
+);
+
+is(
+    $app->log_facility,
+    'local6',
+    'site log_facility'
+);
+
+is(
+    $app->log_priority,
+    'crit',
+    'site log_priority'
 );
 
 eval {

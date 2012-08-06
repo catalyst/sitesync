@@ -5,6 +5,7 @@ use warnings;
 use strict;
 use autodie;
 use Carp;
+use Sys::Syslog qw(openlog syslog closelog);
 
 
 =head1 NAME
@@ -30,8 +31,10 @@ my $default_mappings = {
     cleanup_runner  => 'App::SiteSync::Cleanup',
 };
 
-my $default_config_file = '/etc/sitesync.conf';
-my $default_work_root   = '/var/lib/sitesync';
+my $default_config_file   = '/etc/sitesync.conf';
+my $default_work_root     = '/var/lib/sitesync';
+my $default_log_facility  = 'user';
+my $default_log_priority  = 'info';
 
 
 sub run {
@@ -82,6 +85,7 @@ sub getopt_spec {
         'phase|p=s',
         'site|s=s',
         'target|t=s',
+        'syslog|l',
     );
 }
 
@@ -128,6 +132,8 @@ sub load_config {
     }
 
     $config{work_root}      //= $default_work_root;
+    $config{log_facility}   //= $default_log_facility;
+    $config{log_priority}   //= $default_log_priority;
     $config{class_mappings} //= {};
 
     $self->{config} = \%config;
@@ -177,6 +183,10 @@ sub select_site {
     else {
         die "You must specify which <site> to spider/publish.\n"
             . "Available sites: $site_names\n";
+    }
+
+    foreach my $key (qw( work_root log_facility log_priority )) {
+        $self->{config}->{$key} = $self->{site}->{$key} if $self->{site}->{$key};
     }
 
     $self->extract_domain;
@@ -230,18 +240,9 @@ sub targets {
 }
 
 
-sub work_root {
-    my($self) = @_;
-
-    if(my $site = $self->site) {
-        if(my $work_root = $site->{work_root}) {
-            return $work_root;
-        }
-    }
-    return $self->config('work_root');
-}
-
-
+sub work_root     { shift->{config}->{work_root}; }
+sub log_facility  { shift->{config}->{log_facility}; }
+sub log_priority  { shift->{config}->{log_priority}; }
 sub site          { shift->{site}; }
 sub source_url    { shift->site->{source_url}; }
 sub source_domain { shift->{source_domain}; }
@@ -328,7 +329,26 @@ sub load_class {
 sub log {
     my($self, $message) = @_;
 
-    print "$message\n";
+    if( ! -t 0  or  $self->opt('syslog') ) {
+        $self->log_to_syslog($message);
+        return;
+    }
+    print STDERR  "$message\n";
+}
+
+
+sub log_to_syslog {
+    my($self, $message) = @_;
+
+    my $facility = $self->log_facility;
+    my $priority = $self->log_priority;
+
+    my $ident = 'sitesync';
+    $ident .= '-' . $self->site_name if $self->site_name;
+
+    openlog($ident, 'nofatal,pid', $facility);
+    syslog($priority, '%s', $message);
+    closelog();
 }
 
 
