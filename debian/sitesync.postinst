@@ -15,4 +15,15 @@ add_user_if_missing() {
     fi
 }
 
+make_work_dir() {
+    WORK_DIR="/var/lib/sitesync"
+    if [ ! -d "${WORK_DIR}" ]
+    then
+        mkdir "${WORK_DIR}"
+        chown sitesync:sitesync "${WORK_DIR}"
+    fi
+}
+
 add_user_if_missing
+make_work_dir
+
